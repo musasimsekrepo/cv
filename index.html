@@ -13,34 +13,35 @@
       --muted:#9aa4b2;
       --radius:12px;
       --header-h:64px;
-      --maxw:1600px;
+      --maxw:1400px;
     }
 
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 60%);-webkit-font-smoothing:antialiased}
     a{color:inherit;text-decoration:none}
 
-    /* Fullscreen layout */
-    .fullscreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px}
+    /* Fullscreen centered container */
+    .wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px}
     .card{width:100%;height:100%;max-width:var(--maxw);border-radius:var(--radius);overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 18px 60px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
 
-    /* Header sits at top and does not overlay viewer */
+    /* Header: normal flow (not overlay), fixed height */
     header{height:var(--header-h);min-height:56px;display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-bottom:1px solid rgba(255,255,255,0.02);flex:0 0 var(--header-h)}
     .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;color:#021022;font-weight:700;font-size:16px;flex:0 0 44px}
     .title{display:flex;flex-direction:column;gap:2px}
     .title h1{font-size:15px;margin:0;color:#e6f7fb}
     .title p{margin:0;font-size:12px;color:var(--muted)}
 
-    .meta{margin-left:auto;display:flex;gap:8px;align-items:center}
+    /* Buttons area: same on desktop & mobile, no overlay */
+    .meta{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:var(--glass);color:var(--accent);border:1px solid rgba(6,182,212,0.08);font-weight:600;font-size:13px;cursor:pointer}
     .btn.primary{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#021022;border:none;box-shadow:0 8px 30px rgba(6,182,212,0.12)}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#dbeefe}
 
-    /* Viewer takes remaining space; header height subtracted */
+    /* Viewer: occupies remaining space exactly under header */
     .viewer{flex:1 1 auto;display:block;min-height:0;background:#0b1220}
     iframe{width:100%;height:100%;border:0;display:block;background:#fff}
 
-    /* Responsive: keep header visible and consistent on mobile (no overlays) */
+    /* Mobile: keep header identical, buttons visible and inline (wrap if needed) */
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
@@ -51,12 +52,13 @@
       .btn{padding:8px 10px;font-size:13px}
     }
 
+    /* Ensure no overlay, no fixed-position floating elements */
     /* Accessibility focus */
     .btn:focus{outline:2px solid rgba(6,182,212,0.18);outline-offset:2px}
   </style>
 </head>
 <body>
-  <div class="fullscreen" role="application" aria-label="PDF full screen viewer">
+  <div class="wrap" role="application" aria-label="PDF viewer">
     <div class="card" role="main" aria-live="polite">
       <header>
         <div class="logo" aria-hidden="true">CV</div>
@@ -99,21 +101,24 @@
         });
       }
 
-      // Ensure iframe fills remaining space correctly on mobile (reflow)
-      function adjustIframeHeight(){
-        const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64;
+      // Ensure viewer height is correct after zoom/resize
+      function adjustViewer(){
         const card = document.querySelector('.card');
-        if(card){
-          const rect = card.getBoundingClientRect();
-          const viewer = document.getElementById('viewer');
-          if(viewer){
-            viewer.style.height = (rect.height - headerH) + 'px';
-          }
-        }
+        const header = document.querySelector('header');
+        const viewer = document.getElementById('viewer');
+        if(!card || !header || !viewer) return;
+        // compute available height inside card and set viewer height explicitly
+        const cardRect = card.getBoundingClientRect();
+        const headerH = header.getBoundingClientRect().height;
+        const available = Math.max(0, Math.floor(cardRect.height - headerH));
+        viewer.style.height = available + 'px';
       }
-      window.addEventListener('resize', adjustIframeHeight);
-      window.addEventListener('load', adjustIframeHeight);
-      setTimeout(adjustIframeHeight, 300);
+      window.addEventListener('resize', adjustViewer);
+      window.addEventListener('orientationchange', adjustViewer);
+      window.addEventListener('load', adjustViewer);
+      // also run after a short delay to catch zoom/scale changes
+      setTimeout(adjustViewer, 300);
+      setTimeout(adjustViewer, 900);
     })();
   </script>
 </body>
