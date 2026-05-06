@@ -6,8 +6,8 @@
   <title>CV — PDF Viewer</title>
   <style>
     :root{
-      --page-bg-1: #000000;
-      --page-bg-2: #0b0b0b;
+      --page-bg-1:#000000;
+      --page-bg-2:#0b0b0b;
       --card-bg: rgba(255,255,255,0.02);
       --btn-bg: #111214;
       --btn-bg-hover: #1b1c1d;
@@ -56,8 +56,26 @@
       flex:0 0 var(--header-h);
     }
 
-    /* Left area intentionally empty (no logo, no subtitle) */
-    .left-space{width:1px;opacity:0;pointer-events:none}
+    /* Başlık sol üstte */
+    .title {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      margin-left:6px;
+    }
+    .title h1{
+      font-size:16px;
+      margin:0;
+      color:var(--btn-color);
+      font-weight:700;
+      letter-spacing:0.2px;
+    }
+    .title p{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      display:none; /* subtitle yok, istersen göster */
+    }
 
     /* Buttons container: horizontal scroll on narrow screens so buttons never hide */
     .meta{
@@ -95,7 +113,7 @@
     }
     .btn:hover{background:var(--btn-bg-hover);transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
-    .btn.ghost{ /* ghost variant visually same but slightly lighter border */
+    .btn.ghost{
       background:var(--btn-bg);
       border:1px solid rgba(255,255,255,0.02);
     }
@@ -111,6 +129,7 @@
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
+      .title h1{font-size:15px}
       .meta{gap:6px}
       .btn{padding:8px 10px;font-size:13px;min-height:36px}
     }
@@ -122,11 +141,15 @@
   <div class="wrap">
     <div class="card" role="main" aria-live="polite">
       <header>
-        <div class="left-space" aria-hidden="true"></div>
+        <!-- Başlık geri eklendi -->
+        <div class="title" aria-hidden="false">
+          <h1>Curriculum Vitae</h1>
+        </div>
 
+        <!-- Butonlar (aynı stil) -->
         <div class="meta" id="meta">
           <a class="btn" href="./cv.pdf" download aria-label="PDF indir">PDF İndir</a>
-          <a class="btn" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Aç</a>
+          <a class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Aç</a>
         </div>
       </header>
 
