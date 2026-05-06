@@ -56,7 +56,7 @@
       flex:0 0 var(--header-h);
     }
 
-    /* Başlık sol üstte (font 1 punto küçültüldü: 16 -> 15) */
+    /* Başlık sol üstte (font 1 punto daha küçültüldü: 15 -> 14) */
     .title {
       display:flex;
       flex-direction:column;
@@ -64,7 +64,7 @@
       margin-left:6px;
     }
     .title h1{
-      font-size:15px; /* küçültüldü */
+      font-size:14px; /* 1 punto küçültüldü */
       margin:0;
       color:var(--btn-color);
       font-weight:700;
@@ -86,7 +86,7 @@
     .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.03) transparent}
 
     /* ALL buttons identical style (no icons, same look)
-       Font-size reduced by 1 point (from 13px -> 12px) as requested */
+       Font-size reduced by 1 point (from 12px -> 11px) as requested */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -98,7 +98,7 @@
       color:var(--btn-color);
       border:1px solid rgba(255,255,255,0.04);
       font-weight:600;
-      font-size:12px; /* 1 punto küçültüldü */
+      font-size:11px; /* 1 punto daha küçültüldü */
       cursor:pointer;
       white-space:nowrap;
       text-decoration:none;
@@ -124,9 +124,9 @@
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
-      .title h1{font-size:14px} /* mobilde de 1 punto küçültüldü (15 -> 14) */
+      .title h1{font-size:13px} /* mobilde de 1 punto küçültüldü (14 -> 13) */
       .meta{gap:6px}
-      .btn{padding:8px 10px;font-size:12px;min-height:36px} /* mobilde buton fontu 12px */
+      .btn{padding:8px 10px;font-size:11px;min-height:36px} /* mobilde buton fontu 11px */
     }
 
     .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:2px}
@@ -141,9 +141,8 @@
           <h1>Curriculum Vitae</h1>
         </div>
 
-        <!-- Butonlar: tüm butonlar aynı stil, "Aç" butonu yeni sekmede açar -->
+        <!-- Butonlar: "Web'de Aç" olarak güncellendi -->
         <div class="meta" id="meta">
-          <!-- downloadBtn: hem anchor (download) hem JS fallback ile mobilde çalışması sağlanır -->
           <a id="downloadBtn" class="btn" href="./cv.pdf" download aria-label="PDF indir">PDF İndir</a>
           <a id="openBtn" class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Web'de Aç</a>
         </div>
@@ -205,9 +204,9 @@
         }
       });
 
-      // Ensure "Aç" button label and behavior are correct
+      // Ensure "Web'de Aç" button behavior
       const openBtn = document.getElementById('openBtn');
-      openBtn.textContent = 'Aç';
+      openBtn.textContent = "Web'de Aç";
       openBtn.setAttribute('target', '_blank');
       openBtn.setAttribute('rel', 'noopener');
 
