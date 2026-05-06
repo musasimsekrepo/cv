@@ -70,12 +70,6 @@
       font-weight:700;
       letter-spacing:0.2px;
     }
-    .title p{
-      margin:0;
-      font-size:12px;
-      color:var(--muted);
-      display:none; /* subtitle yok, istersen göster */
-    }
 
     /* Buttons container: horizontal scroll on narrow screens so buttons never hide */
     .meta{
@@ -91,7 +85,8 @@
     .meta::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.03);border-radius:6px}
     .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.03) transparent}
 
-    /* ALL buttons identical style (no icons, same look) */
+    /* ALL buttons identical style (no icons, same look)
+       Font-size reduced by 1 point (from 14px -> 13px) as requested */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -103,7 +98,7 @@
       color:var(--btn-color);
       border:1px solid rgba(255,255,255,0.04);
       font-weight:600;
-      font-size:14px;
+      font-size:13px; /* 1 punto küçültme */
       cursor:pointer;
       white-space:nowrap;
       text-decoration:none;
@@ -141,15 +136,16 @@
   <div class="wrap">
     <div class="card" role="main" aria-live="polite">
       <header>
-        <!-- Başlık geri eklendi -->
+        <!-- Başlık sol üstte -->
         <div class="title" aria-hidden="false">
           <h1>Curriculum Vitae</h1>
         </div>
 
-        <!-- Butonlar (aynı stil) -->
+        <!-- Butonlar: tüm butonlar aynı stil, "Aç" butonu yeni sekmede açar -->
         <div class="meta" id="meta">
-          <a class="btn" href="./cv.pdf" download aria-label="PDF indir">PDF İndir</a>
-          <a class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Aç</a>
+          <!-- downloadBtn: hem anchor (download) hem JS fallback ile mobilde çalışması sağlanır -->
+          <a id="downloadBtn" class="btn" href="./cv.pdf" download aria-label="PDF indir">PDF İndir</a>
+          <a id="openBtn" class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Aç</a>
         </div>
       </header>
 
@@ -161,7 +157,7 @@
 
   <script>
     (function(){
-      // Ensure viewer height equals card height minus header height to avoid overflow on mobile
+      // Fix viewer height to avoid mobile address-bar issues
       function fixViewerHeight(){
         const card = document.querySelector('.card');
         const header = document.querySelector('header');
@@ -177,6 +173,55 @@
       setTimeout(fixViewerHeight, 200);
       setTimeout(fixViewerHeight, 800);
       setTimeout(fixViewerHeight, 1600);
+
+      // Robust download behavior:
+      // - Try native anchor download first (works on many browsers)
+      // - On mobile browsers that ignore download attribute (iOS Safari), fetch the file and trigger blob download
+      // - If fetch fails (CORS or other), fallback to opening in new tab
+      const downloadBtn = document.getElementById('downloadBtn');
+      const pdfPath = downloadBtn.getAttribute('href');
+
+      downloadBtn.addEventListener('click', async function (e) {
+        // Let normal behavior proceed for desktop browsers that support download attribute
+        // But on mobile (iOS) download attribute is often ignored; handle via JS
+        // Detect likely mobile iOS/Android where native download may not work reliably
+        const ua = navigator.userAgent || '';
+        const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+
+        if (!isMobile) {
+          // Desktop: allow default anchor download behavior
+          return;
+        }
+
+        // Mobile: prevent default and try JS download
+        e.preventDefault();
+        try {
+          const resp = await fetch(pdfPath, { credentials: 'same-origin' });
+          if (!resp.ok) throw new Error('Network response not ok');
+          const blob = await resp.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          // Try to preserve filename if possible
+          const filename = (pdfPath.split('/').pop() || 'cv.pdf').split('?')[0];
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          // release object URL after short delay
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+        } catch (err) {
+          // If fetch fails (CORS or other), fallback to opening in new tab so user can manually save
+          window.open(pdfPath, '_blank', 'noopener');
+        }
+      });
+
+      // Ensure "Aç" button label and behavior are correct (opens in new tab)
+      const openBtn = document.getElementById('openBtn');
+      openBtn.textContent = 'Aç'; // ensure label is exactly "Aç"
+      openBtn.setAttribute('target', '_blank');
+      openBtn.setAttribute('rel', 'noopener');
+
     })();
   </script>
 </body>
