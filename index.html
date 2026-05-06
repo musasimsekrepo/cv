@@ -20,7 +20,8 @@
     }
 
     *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--btn-color);background:linear-gradient(180deg,var(--page-bg-1) 0%, var(--page-bg-2) 60%);-webkit-font-smoothing:antialiased}
+    /* Removed explicit font-family so browser's default font is used */
+    html,body{height:100%;margin:0;color:var(--btn-color);background:linear-gradient(180deg,var(--page-bg-1) 0%, var(--page-bg-2) 60%);-webkit-font-smoothing:antialiased}
     a{color:inherit;text-decoration:none}
 
     .wrap{
@@ -56,7 +57,7 @@
       flex:0 0 var(--header-h);
     }
 
-    /* Başlık sol üstte (font 1 punto daha küçültüldü: 15 -> 14) */
+    /* Başlık sol üstte */
     .title {
       display:flex;
       flex-direction:column;
@@ -64,7 +65,7 @@
       margin-left:6px;
     }
     .title h1{
-      font-size:10px; /* 1 punto küçültüldü */
+      font-size:14px;
       margin:0;
       color:var(--btn-color);
       font-weight:700;
@@ -85,8 +86,7 @@
     .meta::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.03);border-radius:6px}
     .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.03) transparent}
 
-    /* ALL buttons identical style (no icons, same look)
-       Font-size reduced by 1 point (from 12px -> 11px) as requested */
+    /* ALL buttons identical style (no icons, same look) */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -98,13 +98,15 @@
       color:var(--btn-color);
       border:1px solid rgba(255,255,255,0.04);
       font-weight:600;
-      font-size:10px; /* 1 punto daha küçültüldü */
+      font-size:11px;
       cursor:pointer;
       white-space:nowrap;
       text-decoration:none;
       transition:background .12s ease, transform .06s ease;
       min-height:40px;
       line-height:1;
+      /* inherit whatever font the browser provides */
+      font-family: inherit;
     }
     .btn:hover{background:var(--btn-bg-hover);transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
@@ -124,9 +126,9 @@
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
-      .title h1{font-size:10px} /* mobilde de 1 punto küçültüldü (14 -> 13) */
+      .title h1{font-size:13px}
       .meta{gap:6px}
-      .btn{padding:8px 10px;font-size:10px;min-height:36px} /* mobilde buton fontu 11px */
+      .btn{padding:8px 10px;font-size:11px;min-height:36px}
     }
 
     .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:2px}
