@@ -20,7 +20,7 @@
     }
 
     *{box-sizing:border-box}
-    /* Sistem UI font yığını eklendi; tarayıcının kendi fontunu kullanır */
+    /* Sistem UI font yığını korunuyor (tarayıcının uygun fontunu kullanır) */
     html,body{
       height:100%;
       margin:0;
@@ -64,7 +64,7 @@
       flex:0 0 var(--header-h);
     }
 
-    /* Başlık sol üstte */
+    /* Başlık sol üstte (1px artırıldı: 15 -> 16) */
     .title {
       display:flex;
       flex-direction:column;
@@ -72,13 +72,14 @@
       margin-left:6px;
     }
     .title h1{
-      font-size:15px;
+      font-size:16px; /* 1px artırıldı */
       margin:0;
       color:var(--btn-color);
       font-weight:700;
       letter-spacing:0.2px;
     }
 
+    /* Buttons container: horizontal scroll on narrow screens so buttons never hide */
     .meta{
       margin-left:auto;
       display:flex;
@@ -92,6 +93,8 @@
     .meta::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.03);border-radius:6px}
     .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.03) transparent}
 
+    /* ALL buttons identical style (no icons, same look)
+       Font-size tüm butonlar için 1px büyütüldü (12 -> 13) */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -103,14 +106,14 @@
       color:var(--btn-color);
       border:1px solid rgba(255,255,255,0.04);
       font-weight:600;
-      font-size:12px;
+      font-size:13px; /* 1px artırıldı */
       cursor:pointer;
       white-space:nowrap;
       text-decoration:none;
       transition:background .12s ease, transform .06s ease;
       min-height:40px;
       line-height:1;
-      font-family: inherit; /* tarayıcı fontunu miras alır */
+      font-family: inherit;
     }
     .btn:hover{background:var(--btn-bg-hover);transform:translateY(-1px)}
     .btn:active{transform:translateY(0)}
@@ -130,9 +133,9 @@
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
-      .title h1{font-size:14px}
+      .title h1{font-size:15px} /* mobilde 1px artırıldı (14 -> 15) */
       .meta{gap:6px}
-      .btn{padding:8px 10px;font-size:12px;min-height:36px}
+      .btn{padding:8px 10px;font-size:13px;min-height:36px} /* mobilde buton fontu 13px */
     }
 
     .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:2px}
@@ -142,10 +145,12 @@
   <div class="wrap">
     <div class="card" role="main" aria-live="polite">
       <header>
+        <!-- Başlık sol üstte -->
         <div class="title" aria-hidden="false">
           <h1>Curriculum Vitae</h1>
         </div>
 
+        <!-- Butonlar: "Web'de Aç" olarak güncellendi -->
         <div class="meta" id="meta">
           <a id="downloadBtn" class="btn" href="./cv.pdf" download aria-label="PDF indir">PDF İndir</a>
           <a id="openBtn" class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Web'de Aç</a>
@@ -160,6 +165,7 @@
 
   <script>
     (function(){
+      // Fix viewer height to avoid mobile address-bar issues
       function fixViewerHeight(){
         const card = document.querySelector('.card');
         const header = document.querySelector('header');
@@ -176,6 +182,7 @@
       setTimeout(fixViewerHeight, 800);
       setTimeout(fixViewerHeight, 1600);
 
+      // Robust download behavior:
       const downloadBtn = document.getElementById('downloadBtn');
       const pdfPath = downloadBtn.getAttribute('href');
 
@@ -184,7 +191,7 @@
         const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
 
         if (!isMobile) {
-          return;
+          return; // desktop: default anchor download
         }
 
         e.preventDefault();
@@ -206,6 +213,7 @@
         }
       });
 
+      // Ensure "Web'de Aç" button behavior
       const openBtn = document.getElementById('openBtn');
       openBtn.textContent = "Web'de Aç";
       openBtn.setAttribute('target', '_blank');
