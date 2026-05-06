@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>CV — PDF Viewer</title>
+  <title>CV - Musa Simsek</title>
   <style>
     :root{
       --page-bg-1:#000000;
@@ -56,7 +56,7 @@
       flex:0 0 var(--header-h);
     }
 
-    /* Başlık sol üstte */
+    /* Başlık sol üstte (font 1 punto küçültüldü: 16 -> 15) */
     .title {
       display:flex;
       flex-direction:column;
@@ -64,7 +64,7 @@
       margin-left:6px;
     }
     .title h1{
-      font-size:16px;
+      font-size:15px; /* küçültüldü */
       margin:0;
       color:var(--btn-color);
       font-weight:700;
@@ -86,7 +86,7 @@
     .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.03) transparent}
 
     /* ALL buttons identical style (no icons, same look)
-       Font-size reduced by 1 point (from 14px -> 13px) as requested */
+       Font-size reduced by 1 point (from 13px -> 12px) as requested */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -98,7 +98,7 @@
       color:var(--btn-color);
       border:1px solid rgba(255,255,255,0.04);
       font-weight:600;
-      font-size:13px; /* 1 punto küçültme */
+      font-size:12px; /* 1 punto küçültüldü */
       cursor:pointer;
       white-space:nowrap;
       text-decoration:none;
@@ -124,9 +124,9 @@
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
-      .title h1{font-size:15px}
+      .title h1{font-size:14px} /* mobilde de 1 punto küçültüldü (15 -> 14) */
       .meta{gap:6px}
-      .btn{padding:8px 10px;font-size:13px;min-height:36px}
+      .btn{padding:8px 10px;font-size:12px;min-height:36px} /* mobilde buton fontu 12px */
     }
 
     .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:2px}
@@ -145,7 +145,7 @@
         <div class="meta" id="meta">
           <!-- downloadBtn: hem anchor (download) hem JS fallback ile mobilde çalışması sağlanır -->
           <a id="downloadBtn" class="btn" href="./cv.pdf" download aria-label="PDF indir">PDF İndir</a>
-          <a id="openBtn" class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Aç</a>
+          <a id="openBtn" class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">Web'de Aç</a>
         </div>
       </header>
 
@@ -175,25 +175,17 @@
       setTimeout(fixViewerHeight, 1600);
 
       // Robust download behavior:
-      // - Try native anchor download first (works on many browsers)
-      // - On mobile browsers that ignore download attribute (iOS Safari), fetch the file and trigger blob download
-      // - If fetch fails (CORS or other), fallback to opening in new tab
       const downloadBtn = document.getElementById('downloadBtn');
       const pdfPath = downloadBtn.getAttribute('href');
 
       downloadBtn.addEventListener('click', async function (e) {
-        // Let normal behavior proceed for desktop browsers that support download attribute
-        // But on mobile (iOS) download attribute is often ignored; handle via JS
-        // Detect likely mobile iOS/Android where native download may not work reliably
         const ua = navigator.userAgent || '';
         const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
 
         if (!isMobile) {
-          // Desktop: allow default anchor download behavior
-          return;
+          return; // desktop: default anchor download
         }
 
-        // Mobile: prevent default and try JS download
         e.preventDefault();
         try {
           const resp = await fetch(pdfPath, { credentials: 'same-origin' });
@@ -202,23 +194,20 @@
           const blobUrl = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = blobUrl;
-          // Try to preserve filename if possible
           const filename = (pdfPath.split('/').pop() || 'cv.pdf').split('?')[0];
           a.download = filename;
           document.body.appendChild(a);
           a.click();
           a.remove();
-          // release object URL after short delay
           setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
         } catch (err) {
-          // If fetch fails (CORS or other), fallback to opening in new tab so user can manually save
           window.open(pdfPath, '_blank', 'noopener');
         }
       });
 
-      // Ensure "Aç" button label and behavior are correct (opens in new tab)
+      // Ensure "Aç" button label and behavior are correct
       const openBtn = document.getElementById('openBtn');
-      openBtn.textContent = 'Aç'; // ensure label is exactly "Aç"
+      openBtn.textContent = 'Aç';
       openBtn.setAttribute('target', '_blank');
       openBtn.setAttribute('rel', 'noopener');
 
