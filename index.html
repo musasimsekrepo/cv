@@ -20,7 +20,7 @@
     }
 
     *{box-sizing:border-box}
-    /* Removed explicit font-family so browser's default font is used */
+    /* Tarayıcının varsayılan fontunu kullanmaya devam ediliyor */
     html,body{height:100%;margin:0;color:var(--btn-color);background:linear-gradient(180deg,var(--page-bg-1) 0%, var(--page-bg-2) 60%);-webkit-font-smoothing:antialiased}
     a{color:inherit;text-decoration:none}
 
@@ -57,7 +57,7 @@
       flex:0 0 var(--header-h);
     }
 
-    /* Başlık sol üstte */
+    /* Başlık sol üstte (1px büyütüldü: 14 -> 15) */
     .title {
       display:flex;
       flex-direction:column;
@@ -65,7 +65,7 @@
       margin-left:6px;
     }
     .title h1{
-      font-size:14px;
+      font-size:15px; /* 1px artırıldı */
       margin:0;
       color:var(--btn-color);
       font-weight:700;
@@ -86,7 +86,8 @@
     .meta::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.03);border-radius:6px}
     .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.03) transparent}
 
-    /* ALL buttons identical style (no icons, same look) */
+    /* ALL buttons identical style (no icons, same look)
+       Font-size tüm butonlar için 1px büyütüldü (11 -> 12) */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -98,14 +99,13 @@
       color:var(--btn-color);
       border:1px solid rgba(255,255,255,0.04);
       font-weight:600;
-      font-size:11px;
+      font-size:12px; /* 1px artırıldı */
       cursor:pointer;
       white-space:nowrap;
       text-decoration:none;
       transition:background .12s ease, transform .06s ease;
       min-height:40px;
       line-height:1;
-      /* inherit whatever font the browser provides */
       font-family: inherit;
     }
     .btn:hover{background:var(--btn-bg-hover);transform:translateY(-1px)}
@@ -126,9 +126,9 @@
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
-      .title h1{font-size:13px}
+      .title h1{font-size:14px} /* mobilde 1px artırıldı (13 -> 14) */
       .meta{gap:6px}
-      .btn{padding:8px 10px;font-size:11px;min-height:36px}
+      .btn{padding:8px 10px;font-size:12px;min-height:36px} /* mobilde buton fontu 12px */
     }
 
     .btn:focus{outline:2px solid rgba(255,255,255,0.06);outline-offset:2px}
