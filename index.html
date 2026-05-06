@@ -13,6 +13,7 @@
       --muted:#9aa4b2;
       --radius:12px;
       --header-h:64px;
+      --page-padding:12px;
       --maxw:1400px;
     }
 
@@ -20,28 +21,83 @@
     html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 60%);-webkit-font-smoothing:antialiased}
     a{color:inherit;text-decoration:none}
 
-    /* Fullscreen centered container */
-    .wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:12px}
-    .card{width:100%;height:100%;max-width:var(--maxw);border-radius:var(--radius);overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 18px 60px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.03);display:flex;flex-direction:column}
+    /* Page wrapper: keep consistent padding on all devices */
+    .wrap{
+      padding:var(--page-padding);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-    /* Header: normal flow (not overlay), fixed height */
-    header{height:var(--header-h);min-height:56px;display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-bottom:1px solid rgba(255,255,255,0.02);flex:0 0 var(--header-h)}
-    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;color:#021022;font-weight:700;font-size:16px;flex:0 0 44px}
+    /* Card fills viewport minus padding; header is part of normal flow (not overlay) */
+    .card{
+      width:100%;
+      max-width:var(--maxw);
+      height:calc(100vh - (var(--page-padding) * 2));
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow:0 18px 60px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;
+      flex-direction:column;
+    }
+
+    /* Header: fixed height, normal flow, always visible at top of card */
+    header{
+      height:var(--header-h);
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 16px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-bottom:1px solid rgba(255,255,255,0.02);
+      flex:0 0 var(--header-h);
+    }
+
+    .logo{
+      width:44px;height:44px;border-radius:8px;
+      background:linear-gradient(135deg,var(--accent),#7c3aed);
+      display:flex;align-items:center;justify-content:center;color:#021022;font-weight:700;font-size:16px;flex:0 0 44px;
+    }
+
     .title{display:flex;flex-direction:column;gap:2px}
     .title h1{font-size:15px;margin:0;color:#e6f7fb}
     .title p{margin:0;font-size:12px;color:var(--muted)}
 
-    /* Buttons area: same on desktop & mobile, no overlay */
-    .meta{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:var(--glass);color:var(--accent);border:1px solid rgba(6,182,212,0.08);font-weight:600;font-size:13px;cursor:pointer}
+    /* Meta/buttons: allow horizontal scroll on narrow screens instead of wrapping to new lines or hiding */
+    .meta{
+      margin-left:auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      padding-bottom:2px; /* small space so scrollbar (if any) doesn't overlap buttons */
+    }
+    /* hide scrollbar visually but keep scrollable */
+    .meta::-webkit-scrollbar{height:6px}
+    .meta::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:6px}
+    .meta{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,0.06) transparent}
+
+    .btn{
+      display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:var(--glass);color:var(--accent);border:1px solid rgba(6,182,212,0.08);font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;
+    }
     .btn.primary{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#021022;border:none;box-shadow:0 8px 30px rgba(6,182,212,0.12)}
     .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:#dbeefe}
 
-    /* Viewer: occupies remaining space exactly under header */
-    .viewer{flex:1 1 auto;display:block;min-height:0;background:#0b1220}
+    /* Viewer: exact remaining height under header, no JS needed for basic layout */
+    .viewer{
+      flex:1 1 auto;
+      min-height:0; /* important for flex children to not overflow */
+      background:#0b1220;
+      display:block;
+    }
     iframe{width:100%;height:100%;border:0;display:block;background:#fff}
 
-    /* Mobile: keep header identical, buttons visible and inline (wrap if needed) */
+    /* Mobile tweaks: keep header identical to desktop, buttons remain visible via horizontal scroll */
     @media (max-width:720px){
       :root{--header-h:56px}
       header{height:var(--header-h);padding:8px 12px}
@@ -52,13 +108,12 @@
       .btn{padding:8px 10px;font-size:13px}
     }
 
-    /* Ensure no overlay, no fixed-position floating elements */
     /* Accessibility focus */
     .btn:focus{outline:2px solid rgba(6,182,212,0.18);outline-offset:2px}
   </style>
 </head>
 <body>
-  <div class="wrap" role="application" aria-label="PDF viewer">
+  <div class="wrap">
     <div class="card" role="main" aria-live="polite">
       <header>
         <div class="logo" aria-hidden="true">CV</div>
@@ -68,7 +123,8 @@
           <p>Europass — PDF</p>
         </div>
 
-        <div class="meta">
+        <!-- Buttons: same layout on desktop and mobile; on narrow screens user can scroll horizontally -->
+        <div class="meta" id="meta">
           <a class="btn" href="./cv.pdf" download aria-label="PDF indir">⬇ PDF İndir</a>
           <a class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">↗ Aç</a>
           <button class="btn" id="copyBtn" aria-label="Linki kopyala">🔗 Kopyala</button>
@@ -101,24 +157,24 @@
         });
       }
 
-      // Ensure viewer height is correct after zoom/resize
-      function adjustViewer(){
+      // Extra safety: if viewport zoom or mobile browser UI changes cause layout shifts,
+      // ensure viewer height equals card height minus header height.
+      function fixViewerHeight(){
         const card = document.querySelector('.card');
         const header = document.querySelector('header');
         const viewer = document.getElementById('viewer');
         if(!card || !header || !viewer) return;
-        // compute available height inside card and set viewer height explicitly
-        const cardRect = card.getBoundingClientRect();
+        const cardH = card.getBoundingClientRect().height;
         const headerH = header.getBoundingClientRect().height;
-        const available = Math.max(0, Math.floor(cardRect.height - headerH));
-        viewer.style.height = available + 'px';
+        viewer.style.height = Math.max(0, Math.floor(cardH - headerH)) + 'px';
       }
-      window.addEventListener('resize', adjustViewer);
-      window.addEventListener('orientationchange', adjustViewer);
-      window.addEventListener('load', adjustViewer);
-      // also run after a short delay to catch zoom/scale changes
-      setTimeout(adjustViewer, 300);
-      setTimeout(adjustViewer, 900);
+      window.addEventListener('resize', fixViewerHeight);
+      window.addEventListener('orientationchange', fixViewerHeight);
+      window.addEventListener('load', fixViewerHeight);
+      // run a few times to catch browser UI changes (mobile address bar show/hide)
+      setTimeout(fixViewerHeight, 200);
+      setTimeout(fixViewerHeight, 800);
+      setTimeout(fixViewerHeight, 1600);
     })();
   </script>
 </body>
