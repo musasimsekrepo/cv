@@ -2,100 +2,288 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>CV — PDF Viewer</title>
   <style>
     :root{
-      --bg:#0f1724;
-      --card:#0b1220;
-      --accent:#06b6d4;
-      --muted:#9aa4b2;
-      --glass: rgba(255,255,255,0.03);
-      --radius:12px;
-      --maxw:1100px;
+      --bg-1: #071022;
+      --bg-2: #071827;
+      --card-bg: rgba(6,12,20,0.6);
+      --glass: rgba(255,255,255,0.04);
+      --accent: #06b6d4;
+      --muted: #9aa4b2;
+      --radius: 12px;
+      --header-h: 64px;
     }
-    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,#071022 0%, #071827 60%);-webkit-font-smoothing:antialiased}
-    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;box-sizing:border-box}
-    .card{width:100%;max-width:var(--maxw);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);box-shadow:0 8px 30px rgba(2,6,23,0.6);overflow:hidden;border:1px solid rgba(255,255,255,0.03);display:grid;grid-template-rows:auto 1fr;min-height:70vh}
-    header{display:flex;align-items:center;gap:16px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.02);background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:flex;align-items:center;justify-content:center;color:#021022;font-weight:700;font-size:18px;box-shadow:0 4px 18px rgba(6,182,212,0.12)}
-    h1{font-size:16px;margin:0;color:#e6f7fb}
-    .meta{margin-left:auto;display:flex;gap:8px;align-items:center}
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:var(--glass);color:var(--accent);text-decoration:none;border:1px solid rgba(6,182,212,0.08);font-weight:600;font-size:13px}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),#7c3aed);color:#021022;border:none;box-shadow:0 6px 18px rgba(6,182,212,0.12)}
-    .viewer{height:calc(100% - 72px);display:block}
-    iframe{width:100%;height:100%;border:0;background:#fff}
-    .fallback{padding:18px;color:var(--muted);font-size:14px;text-align:center}
-    .controls{display:flex;gap:8px;align-items:center}
-    @media (max-width:720px){
-      .card{min-height:60vh}
-      header{padding:12px}
-      .logo{width:36px;height:36px;font-size:15px}
-      h1{font-size:14px}
+
+    /* Reset & base */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:#e6eef6;background:linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 60%);-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+
+    /* Fullscreen container */
+    .fullscreen {
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      padding:12px;
+      gap:12px;
+      z-index:0;
     }
+
+    /* Card fills viewport but keeps small padding on mobile */
+    .card {
+      width:100%;
+      height:100%;
+      max-width:1600px;
+      border-radius:12px;
+      overflow:hidden;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow:0 18px 60px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+      display:flex;
+      flex-direction:column;
+      position:relative;
+    }
+
+    /* Header overlays the viewer (semi-transparent) */
+    header {
+      height:var(--header-h);
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 14px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(255,255,255,0.02);
+      z-index:10;
+      flex:0 0 var(--header-h);
+    }
+
+    .logo {
+      width:44px;
+      height:44px;
+      border-radius:8px;
+      background:linear-gradient(135deg,var(--accent),#7c3aed);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#021022;
+      font-weight:700;
+      font-size:16px;
+      box-shadow:0 6px 20px rgba(6,182,212,0.12);
+      flex:0 0 44px;
+    }
+
+    .title {
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      line-height:1;
+    }
+    .title h1{font-size:15px;margin:0;color:#e6f7fb}
+    .title p{margin:0;font-size:12px;color:var(--muted)}
+
+    .meta {
+      margin-left:auto;
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .btn {
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:10px;
+      background:var(--glass);
+      color:var(--accent);
+      text-decoration:none;
+      border:1px solid rgba(6,182,212,0.08);
+      font-weight:600;
+      font-size:13px;
+      cursor:pointer;
+    }
+    .btn.primary {
+      background:linear-gradient(90deg,var(--accent),#7c3aed);
+      color:#021022;
+      border:none;
+      box-shadow:0 8px 30px rgba(6,182,212,0.12);
+    }
+    .btn.ghost {
+      background:transparent;
+      border:1px solid rgba(255,255,255,0.04);
+      color:#dbeefe;
+    }
+
+    /* Viewer area occupies remaining space and is full-bleed */
+    .viewer {
+      position:relative;
+      flex:1 1 auto;
+      background:#0b1220;
+      display:flex;
+      align-items:stretch;
+      justify-content:center;
+      min-height:0; /* important for flex children */
+    }
+
+    /* iframe fills the viewer fully */
+    iframe {
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      background:#fff;
+    }
+
+    /* fallback message centered */
+    .fallback {
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      color:var(--muted);
+      font-size:15px;
+      text-align:center;
+      background:linear-gradient(180deg, rgba(2,6,23,0.4), rgba(2,6,23,0.6));
+    }
+
+    /* Small floating controls for mobile (bottom) */
+    .mobile-controls {
+      display:none;
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:18px;
+      gap:8px;
+      z-index:20;
+    }
+    .mobile-controls .btn {padding:10px 14px;border-radius:999px;font-size:14px}
+
+    /* Responsive tweaks */
+    @media (max-width:900px){
+      header{padding:10px}
+      .logo{width:40px;height:40px;font-size:14px}
+      .title h1{font-size:14px}
+      .meta{gap:6px}
+    }
+
+    @media (max-width:640px){
+      :root{--header-h:56px}
+      .card{border-radius:10px}
+      header{height:var(--header-h);padding:8px}
+      .title p{display:none}
+      .meta{gap:6px}
+      .btn{padding:8px 10px;font-size:13px}
+      /* show mobile controls and hide header meta to save space */
+      .meta{display:none}
+      .mobile-controls{display:flex}
+      /* make iframe height account for safe area on iOS */
+      iframe{height:calc(100vh - var(--header-h) - env(safe-area-inset-bottom));}
+    }
+
+    /* Accessibility focus */
+    .btn:focus{outline:2px solid rgba(6,182,212,0.18);outline-offset:2px}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card" role="main" aria-label="CV Viewer">
+  <div class="fullscreen" role="application" aria-label="PDF full screen viewer">
+    <div class="card" role="main" aria-live="polite">
       <header>
-        <div class="logo">CV</div>
-        <div>
+        <div class="logo" aria-hidden="true">CV</div>
+
+        <div class="title">
           <h1>Curriculum Vitae</h1>
-          <div style="color:var(--muted);font-size:13px">Europass / PDF</div>
+          <p>Europass — PDF</p>
         </div>
 
-        <div class="meta">
-          <div class="controls">
-            <!-- İndir butonu -->
-            <a class="btn" href="./cv.pdf" download aria-label="PDF indir">⬇ PDF İndir</a>
-            <!-- Yeni sekmede aç -->
-            <a class="btn" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">↗ Aç</a>
-            <!-- Basit paylaşım linki kopyalama -->
-            <button class="btn" id="copyBtn" aria-label="Linki kopyala">🔗 Kopyala</button>
-          </div>
+        <div class="meta" aria-hidden="false">
+          <a class="btn" href="./cv.pdf" download aria-label="PDF indir">⬇ PDF İndir</a>
+          <a class="btn ghost" target="_blank" rel="noopener" href="./cv.pdf" aria-label="PDF yeni sekmede aç">↗ Aç</a>
+          <button class="btn" id="copyBtn" aria-label="Linki kopyala">🔗 Kopyala</button>
         </div>
       </header>
 
-      <!-- PDF gömme: relative path kullan -->
       <div class="viewer" id="viewer">
-        <iframe id="pdfFrame" src="./cv.pdf"></iframe>
-      </div>
+        <iframe id="pdfFrame" src="./cv.pdf" title="CV PDF"></iframe>
 
-      <div class="fallback" id="fallback" hidden>
-        Tarayıcınız PDF gömme desteklemiyor. <a href="./cv.pdf" target="_blank" rel="noopener">PDF'i buradan indir veya aç</a>.
+        <div class="fallback" id="fallback" hidden>
+          Tarayıcınız PDF gömme desteklemiyor. <a href="./cv.pdf" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;margin-left:6px">PDF'i buradan indir veya aç</a>.
+        </div>
       </div>
+    </div>
+
+    <!-- Mobile floating controls -->
+    <div class="mobile-controls" id="mobileControls" aria-hidden="true">
+      <a class="btn primary" href="./cv.pdf" download aria-label="PDF indir mobil">⬇ İndir</a>
+      <a class="btn" target="_blank" rel="noopener" href="./cv.pdf" aria-label="Aç mobil">↗ Aç</a>
+      <button class="btn" id="copyBtnMobile" aria-label="Linki kopyala mobil">🔗 Kopyala</button>
     </div>
   </div>
 
   <script>
-    // Basit fallback kontrolü: iframe yüklenmezse fallback göster
     (function(){
       const iframe = document.getElementById('pdfFrame');
       const fallback = document.getElementById('fallback');
-      // Eğer iframe src'si yüklenmezse 2s sonra fallback göster
       let loaded = false;
       iframe.addEventListener('load', ()=> loaded = true);
+      // If iframe doesn't load in 2.5s show fallback
       setTimeout(()=> {
         if(!loaded){
           iframe.style.display = 'none';
           fallback.hidden = false;
         }
-      }, 2000);
+      }, 2500);
 
-      // Kopyala butonu: sayfa URL'sini kopyalar
+      // Copy link logic (desktop)
       const copyBtn = document.getElementById('copyBtn');
-      copyBtn.addEventListener('click', async ()=>{
-        const url = location.href.replace(/\/$/, '') + '/';
-        try{
-          await navigator.clipboard.writeText(url);
-          copyBtn.textContent = 'Kopyalandı ✓';
-          setTimeout(()=> copyBtn.textContent = '🔗 Kopyala', 1500);
-        }catch(e){
-          copyBtn.textContent = 'Kopyalama başarısız';
-          setTimeout(()=> copyBtn.textContent = '🔗 Kopyala', 1500);
+      if(copyBtn){
+        copyBtn.addEventListener('click', async ()=>{
+          const url = location.href.replace(/\/$/, '') + '/';
+          try{
+            await navigator.clipboard.writeText(url);
+            copyBtn.textContent = 'Kopyalandı ✓';
+            setTimeout(()=> copyBtn.textContent = '🔗 Kopyala', 1500);
+          }catch(e){
+            copyBtn.textContent = 'Kopyalama başarısız';
+            setTimeout(()=> copyBtn.textContent = '🔗 Kopyala', 1500);
+          }
+        });
+      }
+
+      // Mobile copy button
+      const copyBtnMobile = document.getElementById('copyBtnMobile');
+      if(copyBtnMobile){
+        copyBtnMobile.addEventListener('click', async ()=>{
+          const url = location.href.replace(/\/$/, '') + '/';
+          try{
+            await navigator.clipboard.writeText(url);
+            copyBtnMobile.textContent = 'Kopyalandı ✓';
+            setTimeout(()=> copyBtnMobile.textContent = '🔗 Kopyala', 1500);
+          }catch(e){
+            copyBtnMobile.textContent = 'Hata';
+            setTimeout(()=> copyBtnMobile.textContent = '🔗 Kopyala', 1500);
+          }
+        });
+      }
+
+      // Show mobile controls only on small screens
+      function updateMobileControls(){
+        const mc = document.getElementById('mobileControls');
+        if(window.matchMedia && window.matchMedia('(max-width:640px)').matches){
+          mc.setAttribute('aria-hidden','false');
+        }else{
+          mc.setAttribute('aria-hidden','true');
         }
-      });
+      }
+      updateMobileControls();
+      window.addEventListener('resize', updateMobileControls);
     })();
   </script>
 </body>
